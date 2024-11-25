@@ -1,4 +1,4 @@
-{ lib, vmTools, udev, gptfdisk, util-linux, dosfstools, e2fsprogs }:
+{ lib, vmTools, systemd, gptfdisk, util-linux, dosfstools, e2fsprogs }:
 vmTools.makeImageFromDebDist {
   inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesList;
 
@@ -10,10 +10,13 @@ vmTools.makeImageFromDebDist {
     "sysvinit"
   ]) vmTools.debDistros.debian12x86_64.packages ++ [
     "systemd" # init system
+    "zstd" # for initramfs compression
+    "dbus"
     "init-system-helpers" # satisfy undeclared dependency on update-rc.d in udev hooks
     "systemd-sysv" # provides systemd as /sbin/init
-
-    "linux-image-generic" # kernel
+    
+    "apt" # Add apt to update and upgrade
+    "linux-image-amd64" # kernel
     "initramfs-tools" # hooks for generating an initramfs
     "e2fsprogs" # initramfs wants fsck
     "grub-efi" # boot loader
@@ -42,13 +45,16 @@ vmTools.makeImageFromDebDist {
     # update-grub needs udev to detect the filesystem UUID -- without,
     # we'll get root=/dev/vda2 on the cmdline which will only work in
     # a limited set of scenarios.
-    ${udev}/lib/systemd/systemd-udevd &
-    ${udev}/bin/udevadm trigger
-    ${udev}/bin/udevadm settle
+    ${systemd}/lib/systemd/systemd-udevd &
+    ${systemd}/bin/udevadm trigger
+    ${systemd}/bin/udevadm settle
 
     ${util-linux}/bin/mount -t sysfs sysfs /mnt/sys
+    #ls /sys/firmware/efi/efivars
 
     chroot /mnt /bin/bash -exuo pipefail <<CHROOT
+    # TODO: Enable OVMF
+    #mount -t efivarfs efivarfs /sys/firmware/efi/efivars
     export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
     # update-initramfs needs to know where its root filesystem lives,
@@ -62,12 +68,16 @@ vmTools.makeImageFromDebDist {
     # Remove "quiet" from the command line so that we can see what's happening during boot
     cat >> /etc/default/grub <<EOF
     GRUB_TIMEOUT=5
-    GRUB_CMDLINE_LINUX=""
+    GRUB_CMDLINE_LINUX="console=ttyS0"
     GRUB_CMDLINE_LINUX_DEFAULT=""
     EOF
     sed -i '/TIMEOUT_HIDDEN/d' /etc/default/grub
     update-grub
     grub-install --target x86_64-efi
+
+    #export DEBIAN_FRONTEND=noninteractive
+    #apt update
+    #apt upgrade -y
 
     # Set a password so we can log into the booted system
     echo root:root | chpasswd
