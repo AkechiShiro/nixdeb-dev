@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:lheckemann/nixpkgs/foreign-distros";
+    nixpkgs.url = "github:nixos/nixpkgs/foreign-distros";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
