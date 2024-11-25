@@ -1,11 +1,11 @@
 { lib, vmTools, udev, gptfdisk, util-linux, dosfstools, e2fsprogs }:
 vmTools.makeImageFromDebDist {
-  inherit (vmTools.debDistros.ubuntu2004x86_64) name fullName urlPrefix packagesLists;
+  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesLists;
 
   packages = lib.filter (p: !lib.elem p [
     "g++" "make" "dpkg-dev" "pkg-config"
     "sysvinit"
-  ]) vmTools.debDistros.ubuntu2004x86_64.packages ++ [
+  ]) vmTools.debDistros.debian12x86_64.packages ++ [
     "systemd" # init system
     "init-system-helpers" # satisfy undeclared dependency on update-rc.d in udev hooks
     "systemd-sysv" # provides systemd as /sbin/init
