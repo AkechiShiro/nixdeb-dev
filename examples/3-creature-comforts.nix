@@ -1,6 +1,6 @@
 { lib, vmTools, udev, gptfdisk, util-linux, dosfstools, e2fsprogs }:
 vmTools.makeImageFromDebDist {
-  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesLists;
+  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesList;
 
   packages = lib.filter (p: !lib.elem p [
     "g++" "make" "dpkg-dev" "pkg-config"
@@ -61,9 +61,14 @@ vmTools.makeImageFromDebDist {
 
     # APT sources so we can update the system and install new packages
     cat > /etc/apt/sources.list <<SOURCES
-    deb http://archive.ubuntu.com/ubuntu focal main restricted universe
-    deb http://security.ubuntu.com/ubuntu focal-security main restricted universe
-    deb http://archive.ubuntu.com/ubuntu focal-updates main restricted universe
+    deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+    deb-src http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+    
+    deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+    deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+    
+    deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+    deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
     SOURCES
 
     # Install the boot loader to the EFI System Partition
@@ -112,10 +117,23 @@ vmTools.makeImageFromDebDist {
     mkdir -p /root/.ssh
     chmod 0700 /root
     cat >/root/.ssh/authorized_keys <<KEYS
-    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN3EmXYSXsimS+vlGYtfTkOGuwvkXU0uHd2yYKLOxD2F linus@geruest
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILiE4hCgDRc4tGMICgq3KF9lNilZS55AEczleP0rwfUN akechi@guest
     KEYS
     CHROOT
     ${util-linux}/bin/umount /mnt/boot/efi
     ${util-linux}/bin/umount /mnt/sys
+    # TODO: INSTALL Kali Linux stuff 
+    #sudo apt update
+    #sudo apt -y install wget gnupg dirmngr
+    #sudo wget -q -O - https://archive.kali.org/archive-key.asc | gpg --import
+    #sudo gpg --keyserver keyserver.ubuntu.com --recv-key 44C6513A8E4FB3D30875F758ED444FF07D8D0BF6
+    #sudo sh -c "echo 'deb http://http.kali.org/kali kali-rolling main non-free contrib' >> /etc/apt/sources.list"
+    #sudo sh -c "echo 'deb http://http.kali.org/kali kali-last-snapshot main non-free contrib' >> /etc/apt/sources.list"
+    #sudo gpg -a --export ED444FF07D8D0BF6 | sudo apt-key add -
+    #sudo apt update
+    #sudo apt -y upgrade
+    #sudo apt -y dist-upgrade
+    #sudo apt -y autoremove --purge
+    #sudo apt -y install kali-linux-everything
   '';
 }

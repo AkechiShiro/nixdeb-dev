@@ -1,6 +1,6 @@
 { lib, vmTools, udev, gptfdisk, util-linux, dosfstools, e2fsprogs }:
 vmTools.makeImageFromDebDist {
-  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesLists;
+  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesList;
 
   packages = lib.filter (p: !lib.elem p [
     # Filter out these packages from the default list in nixpkgs
