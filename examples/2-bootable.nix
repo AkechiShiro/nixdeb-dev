@@ -53,8 +53,6 @@ vmTools.makeImageFromDebDist {
     #ls /sys/firmware/efi/efivars
 
     chroot /mnt /bin/bash -exuo pipefail <<CHROOT
-    # TODO: Enable OVMF
-    #mount -t efivarfs efivarfs /sys/firmware/efi/efivars
     export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
     # update-initramfs needs to know where its root filesystem lives,
@@ -73,7 +71,7 @@ vmTools.makeImageFromDebDist {
     EOF
     sed -i '/TIMEOUT_HIDDEN/d' /etc/default/grub
     update-grub
-    grub-install --target x86_64-efi
+    grub-install --target x86_64-efi --removable
 
     #export DEBIAN_FRONTEND=noninteractive
     #apt update
