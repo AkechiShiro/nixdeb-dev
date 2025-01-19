@@ -1,7 +1,7 @@
 # Working code for building Debian bootable and Kali Linux image from Nix 
 
-- See examples/4-kali-linux.nix
-- See examples/3-creature-comforts for Debian
+- See [examples/4-kali-linux.nix for Kali Linux](./examples/4-kali-linux.nix)
+- See [examples/3-creature-comforts for Debian](./examples/3-creature-comforts.nix)
 
 ## How to use 
 
