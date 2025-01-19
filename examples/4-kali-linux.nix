@@ -28,6 +28,7 @@ vmTools.makeImageFromDebDist {
     "openssh-server" # Remote login
     "zstd" # initramfs better compression than gzip
     "inetutils-tools" # ping/traceroute/ftp/telnet binaries
+    "dialog" # needed by apt for choices
 
     # Custom packages I need
     "neovim"
@@ -36,15 +37,19 @@ vmTools.makeImageFromDebDist {
     "wget"
     "gnupg"
     "dirmngr"
+    "libbpf-tools"
+    "lightdm"
     # Needed for xfce4 autostart
     "xinit"
     "xserver-xorg-core"
-    "keyboard-configuration"
-    "dialog"
+    "udev"
     # Kali Meta packages
     "kali-desktop-xfce"
     "kali-desktop-core"
     "kali-linux-core"
+    "kali-system-cli"
+    "kali-system-core"
+    "kali-system-gui"
   ];
 
   size = vmSize;
