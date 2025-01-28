@@ -10,7 +10,7 @@ vmTools.makeImageFromDebDist {
   packages = lib.filter (p: !lib.elem p [
     "g++" "make" "dpkg-dev" "pkg-config"
     "sysvinit"
-  ]) vmTools.debDistros.kalilinuxRollingx86_64.packages ++ [
+  ]) vmTools.debDistros.kalirolling_upstream_x86_64.packages ++ [
     "systemd" # init system
     "systemd-resolved" # needed for networkctl
     "dbus" # needed for networkctl
