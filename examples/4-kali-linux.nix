@@ -44,8 +44,9 @@ vmTools.makeImageFromDebDist {
     "xserver-xorg-core"
     "udev"
     # Needed for x11 keyboard/input in xfce4
-    "xserver-xorg-input-evdev"
-    "xinput"
+    "xserver-xorg-input-libinput"
+    # XFCE4 Notification plugin breaks without
+    "xfce4-notifyd"
     # Kali Meta packages
     "kali-desktop-xfce"
     "kali-desktop-core"
