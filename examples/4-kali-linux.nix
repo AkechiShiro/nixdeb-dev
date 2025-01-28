@@ -5,7 +5,7 @@ let
    vmSize = 8192;
 in
 vmTools.makeImageFromDebDist {
-  inherit (vmTools.debDistros.kalilinuxRollingx86_64) name fullName urlPrefix packagesList;
+  inherit (vmTools.debDistros.kalirolling_upstream_x86_64) name fullName urlPrefix packagesList;
 
   packages = lib.filter (p: !lib.elem p [
     "g++" "make" "dpkg-dev" "pkg-config"
@@ -43,6 +43,9 @@ vmTools.makeImageFromDebDist {
     "xinit"
     "xserver-xorg-core"
     "udev"
+    # Needed for x11 keyboard/input in xfce4
+    "xserver-xorg-input-evdev"
+    "xinput"
     # Kali Meta packages
     "kali-desktop-xfce"
     "kali-desktop-core"
