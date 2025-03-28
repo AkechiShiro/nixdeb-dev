@@ -97,7 +97,7 @@ vmTools.makeImageFromDebDist {
     EOF
     sed -i '/TIMEOUT_HIDDEN/d' /etc/default/grub
     update-grub
-    grub-install --target x86_64-efi
+    grub-install --target x86_64-efi --removable
 
     # Configure networking using systemd-networkd
     ln -snf /lib/systemd/resolv.conf /etc/resolv.conf
