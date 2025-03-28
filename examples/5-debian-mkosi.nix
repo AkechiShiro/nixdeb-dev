@@ -1,13 +1,12 @@
 { lib, vmTools, systemd, gptfdisk, util-linux, dosfstools, e2fsprogs }:
 vmTools.makeImageFromDebDist {
-  inherit (vmTools.debDistros.debian12x86_64) name fullName urlPrefix packagesList;
+  inherit (vmTools.debDistros.debian12sidx86_64) name fullName urlPrefix packagesList;
 
   packages = lib.filter (p: !lib.elem p [
     "g++" "make" "dpkg-dev" "pkg-config"
     "sysvinit"
-  ]) vmTools.debDistros.debian12x86_64.packages ++ [
+  ]) vmTools.debDistros.debian12sidx86_64.packages ++ [
     "systemd" # init system
-    "systemd-resolved"
     "init-system-helpers" # satisfy undeclared dependency on update-rc.d in udev hooks
     "systemd-sysv" # provides systemd as /sbin/init
     "linux-image-amd64" # kernel
@@ -19,6 +18,18 @@ vmTools.makeImageFromDebDist {
     "ncurses-base" # terminfo to let applications talk to terminals better
     "openssh-server" # Remote login
     "dbus" # networkctl
+    "systemd-boot"
+    "systemd"
+    "tpm2-tools"
+    "sbsigntool"
+    "mkosi"
+    "xinit"
+    "xserver-xorg-core"
+    "udev"
+    # Needed for x11 keyboard/input in xfce4
+    "xserver-xorg-input-libinput"
+    "xfce4"
+    "xfce4-notifyd"
   ];
 
   size = 8192;
@@ -72,22 +83,6 @@ vmTools.makeImageFromDebDist {
     deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
     SOURCES
 
-    # TODO: INSTALL Kali Linux stuff 
-    #apt update
-    #apt upgrade -y
-    #apt -y install wget gnupg dirmngr
-    #wget -q -O - https://archive.kali.org/archive-key.asc | gpg --import
-    #gpg --keyserver keyserver.ubuntu.com --recv-key 44C6513A8E4FB3D30875F758ED444FF07D8D0BF6
-    #sh -c "echo 'deb http://http.kali.org/kali kali-rolling main non-free contrib' >> /etc/apt/sources.list"
-    #sh -c "echo 'deb http://http.kali.org/kali kali-last-snapshot main non-free contrib' >> /etc/apt/sources.list"
-    #gpg -a --export ED444FF07D8D0BF6 | sudo apt-key add -
-    #apt update
-    #apt -y upgrade
-    #apt -y dist-upgrade
-    #apt -y autoremove --purge
-    #apt -y install kali-desktop-xfce xrdp kali-tools kali-linux
-
-
     # Install the boot loader to the EFI System Partition
     # Remove "quiet" from the command line so that we can see what's happening during boot
     cat >> /etc/default/grub <<EOF
@@ -97,7 +92,7 @@ vmTools.makeImageFromDebDist {
     EOF
     sed -i '/TIMEOUT_HIDDEN/d' /etc/default/grub
     update-grub
-    grub-install --target x86_64-efi
+    grub-install --target x86_64-efi --removable
 
     # Configure networking using systemd-networkd
     ln -snf /lib/systemd/resolv.conf /etc/resolv.conf
@@ -130,7 +125,7 @@ vmTools.makeImageFromDebDist {
     systemctl enable generate-host-keys
 
     echo root:root | chpasswd
-    # Prepopulate with my SSH key
+    # Prepopulate with my Public SSH key
     mkdir -p /root/.ssh
     chmod 0700 /root
     cat >/root/.ssh/authorized_keys <<KEYS
